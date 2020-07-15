@@ -1,0 +1,42 @@
+#content{
+    text-align: center;
+    font-size: 50px;
+}
+#footer{
+    height: 30px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    bottom: 0px;
+}
+.wrap{
+    white-space: normal;
+}
+#detImg img{
+    max-width: 500px;
+    max-height: 500px;
+}
+
+ul {
+    margin: 0 auto;
+    text-align: center;
+    columns: 2;
+}
+
+li {
+    display: inline-block;
+}
+
+ul.topnav {    
+    margin: 0 auto;
+    text-align: left;
+  }
+
+input[type=text] {
+    float: right;
+    padding-left: 30px;
+    border: none;
+    margin-top: 8px;
+    font-size: 17px;
+    vertical-align: middle;
+  }

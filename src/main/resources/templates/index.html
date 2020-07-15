@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+    <head> 
+        
+        <title>News Aggregator</title>
+        <meta name="viewport" content="width=device-width. initial-scale=1">
+        <meta charset="utf-8">
+        <script src="news_scripts.js"></script>
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+        <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+        <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+        <link rel="stylesheet" href="styles.css">
+        
+            
+    </head>
+        
+    <body>        
+        <!-- Master Page-->
+        <div data-role="page" id="master">
+
+            <div data-role="content" id="content"><h1>Business News</h1></div>
+
+            <ul class="topnav">
+                <li> 
+                    <select id="category" onchange='fetchNews()'>
+                        <option value="World">All News</option>
+                        <option value="Sports">Sports News</option>
+                        <option value="Business">Bussiness News</option>
+                        <option value="Health">Health News</option>
+                        <option value="Entertainment">Entertainment News</option>
+                        <option value="Science">Science News</option>
+                        <option value="Technology">Technology News</option>
+                    </select>
+                </li>
+                <li>
+                    <select id="country" onchange="fetchNews()">
+                        <option value="usa"> America</option>
+                        <option value="japan"> Japan</option>
+                        <option value="mexico"> Mexico</option>
+                        <option value="india"> India</option>
+                        <option value="china"> China</option>
+                        <option value="korea"> Korea</option>
+                    </select>
+                </li>
+                <li>                    
+                    <input id="search" type="text" placeholder="Search.." onchange='fetchNews()'>
+                </li>
+              </ul>               
+            <div id="stories">
+                <ul id="storyList" data-role="listview"></ul>
+            </div>
+            <div data-role="footer" id="footer">&copy;NEWS FEED v1.0</div>
+        </div>
+        
+        <!-- Detail Page-->
+            <div data-role="page" id="detail">
+                <div data-role="content">
+                    <div id="detTitle"></div>
+                    <div id="detInfo"></div>
+                    <div id="detImg"></div>
+                    <div id="detStory"></div>
+                    <div id="fullStoryLink"></div>
+                    <a href="#master"><button>All Stories</button></a>
+                </div>
+                <div data-role="footer" id="footer">&copy;NEWS FEED v1.0</div>
+            </div>
+
+
+
+            <script>
+                let out = ""; 
+                let articles = [];     
+                fetchNews();
+                function fetchNews(){
+                    var category = document.getElementById("category").value+" ";
+                    document.getElementById("content").innerHTML=('<h1>'+category+' News</h1>');
+
+                    var search = document.getElementById("search").value;
+                    var country = document.getElementById("country").value;
+                    search += country+" ";
+                    search += category;
+                
+                console.log(search); 
+
+                var settings = {
+                    "async": true,
+                    "crossDomain": true,
+                    "url": "https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/NewsSearchAPI?autoCorrect=false&pageNumber=1&pageSize=50&q="
+                    +search+"&safeSearch=false",
+                    "method": "GET",
+                    "headers": {
+                        "x-rapidapi-host": "contextualwebsearch-websearch-v1.p.rapidapi.com",
+                        "x-rapidapi-key": "7d9adbf10fmsh376dc1bad317669p1f5942jsna1f4a4160413"
+                    }
+                }
+
+                $.ajax(settings).done(function (response) {
+                    console.log(response);
+                    showArticles(response.value);
+                });
+
+                
+                /*url ='https://thingproxy.freeboard.io/fetch/https://newsapi.org/v2/top-headlines?'+
+                    category+
+                    search+
+                    country+
+                    'apiKey='+key;
+                    
+                    $.getJSON(url, function(data){
+                        showArticles(data.articles);                    
+                    });    */       
+                }
+
+                function showArticles(_articles){ 
+                    out = "";
+                    articles = _articles;
+                    for(x in articles){    
+                        displayStory(articles[x],x);
+                        $("#storyList").html(out);
+                        $("#storyList"). listview("refresh");
+                    }
+                }
+
+                function displayStory(story, storyNum){
+                    const number = storyNum;
+                    const title = story.title;
+                    const source = story.provider.name;
+                    const image = story.image.url;
+                    const storyTime = story.datePublished;
+                    const description = story.body;
+
+                    out +="<li onclick='populateDetail(" + number + ")'class='wrap'>";
+                    out +="<a href='#detail'>";
+                    out +="<img src='" + image + "'/>";
+                    out +="<strong>" + title + "</strong>";
+                    out +="<br/>"+storyTime+" | "+source;
+                    out +="<p class='wrap'>" + description + "</p>";
+                    out +="</a></li>";
+                }
+
+                function populateDetail(storyNum){
+                    const story = articles[storyNum];
+                    console.log(story);
+                    $('#detTitle').html("<h1>"+story.title+"</h1");
+                    $('#detInfo').html(story.provider.name+" | "+story.datePublished);
+                    $('#detImg').html("<img src='"+story.image.url + "'/>");
+                    $('#detStory').html("<p>"+story.description+"</p>");
+                    $('#fullStoryLink').html("<a href='"+story.url+"'target='_blank'>FullStory</a>");
+                }
+            </script>
+    </body>
+</html>
