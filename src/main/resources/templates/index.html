@@ -23,7 +23,7 @@
             <ul class="topnav">
                 <li> 
                     <select id="category" onchange='fetchNews()'>
-                        <option value="World">All News</option>
+                        <option value="All">All News</option>
                         <option value="Sports">Sports News</option>
                         <option value="Business">Bussiness News</option>
                         <option value="Health">Health News</option>
@@ -34,12 +34,12 @@
                 </li>
                 <li>
                     <select id="country" onchange="fetchNews()">
-                        <option value="usa"> America</option>
-                        <option value="japan"> Japan</option>
-                        <option value="mexico"> Mexico</option>
-                        <option value="india"> India</option>
-                        <option value="china"> China</option>
-                        <option value="korea"> Korea</option>
+                        <option value="us"> America</option>
+                        <option value="jp"> Japan</option>
+                        <option value="mx"> Mexico</option>
+                        <option value="in"> India</option>
+                        <option value="cn"> China</option>
+                        <option value="kr"> Korea</option>
                     </select>
                 </li>
                 <li>                    
@@ -72,35 +72,26 @@
                 let articles = [];     
                 fetchNews();
                 function fetchNews(){
-                    var category = document.getElementById("category").value+" ";
+                    var category = document.getElementById("category").value;
                     document.getElementById("content").innerHTML=('<h1>'+category+' News</h1>');
 
                     var search = document.getElementById("search").value;
-                    var country = document.getElementById("country").value;
-                    search += country+" ";
-                    search += category;
+                    var country = "country="+document.getElementById("country").value+'&';
                 
-                console.log(search); 
 
-                var settings = {
-                    "async": true,
-                    "crossDomain": true,
-                    "url": "https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/NewsSearchAPI?autoCorrect=false&pageNumber=1&pageSize=50&q="
-                    +search+"&safeSearch=false",
-                    "method": "GET",
-                    "headers": {
-                        "x-rapidapi-host": "contextualwebsearch-websearch-v1.p.rapidapi.com",
-                        "x-rapidapi-key": "7d9adbf10fmsh376dc1bad317669p1f5942jsna1f4a4160413"
-                    }
+                if(category != 'All'){
+                    category = 'category='+category.toLowerCase()+'&';
+                }else{
+                    category = '';
+                }                
+                if(search != null & search != ""){
+                    search = 'q='+search+'&';
                 }
-
-                $.ajax(settings).done(function (response) {
-                    console.log(response);
-                    showArticles(response.value);
-                });
-
+                else{
+                    search = '';
+                }
                 
-                /*url ='https://thingproxy.freeboard.io/fetch/https://newsapi.org/v2/top-headlines?'+
+               url ='https://newsapi.org/v2/top-headlines?'+
                     category+
                     search+
                     country+
@@ -108,7 +99,7 @@
                     
                     $.getJSON(url, function(data){
                         showArticles(data.articles);                    
-                    });    */       
+                    });        
                 }
 
                 function showArticles(_articles){ 
@@ -124,10 +115,10 @@
                 function displayStory(story, storyNum){
                     const number = storyNum;
                     const title = story.title;
-                    const source = story.provider.name;
-                    const image = story.image.url;
-                    const storyTime = story.datePublished;
-                    const description = story.body;
+                    const source = story.source.name;
+                    const image = story.urlToImage;
+                    const storyTime = story.publishedAt;
+                    const description = story.description;
 
                     out +="<li onclick='populateDetail(" + number + ")'class='wrap'>";
                     out +="<a href='#detail'>";
@@ -142,8 +133,8 @@
                     const story = articles[storyNum];
                     console.log(story);
                     $('#detTitle').html("<h1>"+story.title+"</h1");
-                    $('#detInfo').html(story.provider.name+" | "+story.datePublished);
-                    $('#detImg').html("<img src='"+story.image.url + "'/>");
+                    $('#detInfo').html(story.source.name+" | "+story.publishedAt);
+                    $('#detImg').html("<img src='"+story.urlToImage + "'/>");
                     $('#detStory').html("<p>"+story.description+"</p>");
                     $('#fullStoryLink').html("<a href='"+story.url+"'target='_blank'>FullStory</a>");
                 }
